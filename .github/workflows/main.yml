@@ -1,0 +1,31 @@
+name: deploy storybook
+on:
+  push:
+    branches: [main]
+    paths:
+      - frontend
+      - .github/workflows/main.yml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Node.js for use with actions
+        uses: actions/setup-node@v2.1.2
+        with:
+          node-version: 14.15.1
+      - name: Install Dependencies
+        run: npm ci
+      - name: Build storybook
+        run: npm run build-storybook
+      - name: Copy files to the test website with the AWS CLI
+        run: |
+          aws s3 cp --recursive ./storybook-static s3://${BUCKET_NAME}/storybook/main
+        env:
+          BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ap-northeast-1
