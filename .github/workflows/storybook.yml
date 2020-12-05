@@ -4,11 +4,11 @@ on:
     branches: [main]
     paths:
       - frontend
-      - .github/workflows/main.yml
+      - .github/workflows/storybook*
   pull_request:
     paths:
       - frontend
-      - .github/workflows/main.yml
+      - .github/workflows/storybook*
 jobs:
   build:
     runs-on: ubuntu-latest
