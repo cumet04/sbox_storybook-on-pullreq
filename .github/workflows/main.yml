@@ -5,6 +5,10 @@ on:
     paths:
       - frontend
       - .github/workflows/main.yml
+  pull_request:
+    paths:
+      - frontend
+      - .github/workflows/main.yml
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -21,11 +25,17 @@ jobs:
         run: npm ci
       - name: Build storybook
         run: npm run build-storybook
-      - name: Copy files to the test website with the AWS CLI
+      - name: set upload destination directory name
         run: |
-          aws s3 cp --recursive ./storybook-static s3://${BUCKET_NAME}/storybook/main
+          DEST_DIR=${{ github.event.pull_request.number }}
+          [ -z $DEST_DIR ] && DEST_DIR=main
+          echo "DEST_DIR=${DEST_DIR}" >> $GITHUB_ENV
+      - name: upload storybook-static
+        run: |
+          aws s3 cp --recursive \
+            ./storybook-static \
+            s3://${{ secrets.BUCKET_NAME }}/storybook/${DEST_DIR}
         env:
-          BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ap-northeast-1
