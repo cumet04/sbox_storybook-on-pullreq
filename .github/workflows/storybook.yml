@@ -5,15 +5,17 @@ on:
     paths:
       - frontend/.storybook
       - frontend/src/stories
-      - .github/workflows/storybook*
+      - .github/workflows/storybook.yml
   pull_request:
+    types: [opened, reopened, synchronize, closed]
     paths:
       - frontend/.storybook
       - frontend/src/stories
-      - .github/workflows/storybook*
+      - .github/workflows/storybook.yml
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
+    if: github.event.action == 'opened' || github.event.action == 'synchronize'
     defaults:
       run:
         working-directory: frontend
@@ -42,7 +44,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ap-northeast-1
       - name: post preview url to pull-request
-        if: github.event.pull_request.action == 'opened'
+        if: github.event.action == 'opened'
         uses: actions/github-script@v3
         with:
           script: |
@@ -53,3 +55,16 @@ jobs:
               body: 'storybook preview created!!\n' +
                 'https://${{ secrets.BUCKET_NAME }}.s3-ap-northeast-1.amazonaws.com/storybook/${{ github.event.pull_request.number }}/index.html'
             })
+  clean:
+    runs-on: ubuntu-latest
+    if: github.event.action == 'closed'
+    steps:
+      - name: remove storybook-static
+        run: |
+          DEST_DIR=${{ github.event.pull_request.number }}
+          aws s3 rm --recursive \
+            s3://${{ secrets.BUCKET_NAME }}/storybook/${DEST_DIR}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ap-northeast-1
