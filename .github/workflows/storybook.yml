@@ -39,3 +39,15 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ap-northeast-1
+      - name: post preview url to pull-request
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v3
+        with:
+          script: |
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: 'storybook preview created!!\n' +
+                'https://${{ secrets.BUCKET_NAME }}.s3-ap-northeast-1.amazonaws.com/storybook/${{ github.event.pull_request.number }}/index.html'
+            })
