@@ -3,11 +3,13 @@ on:
   push:
     branches: [main]
     paths:
-      - frontend
+      - frontend/.storybook
+      - frontend/src/stories
       - .github/workflows/storybook*
   pull_request:
     paths:
-      - frontend
+      - frontend/.storybook
+      - frontend/src/stories
       - .github/workflows/storybook*
 jobs:
   build:
