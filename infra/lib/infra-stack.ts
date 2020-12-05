@@ -36,5 +36,12 @@ export class InfraStack extends cdk.Stack {
         },
       })
     );
+
+    new iam.User(this, "iamContentUploader").addToPolicy(
+      new iam.PolicyStatement({
+        actions: ["s3:PutObject"],
+        resources: [`${bucket.bucketArn}/*`],
+      })
+    );
   }
 }
