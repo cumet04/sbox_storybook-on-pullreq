@@ -40,7 +40,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ap-northeast-1
       - name: post preview url to pull-request
-        if: github.event_name == 'pull_request'
+        if: github.event.pull_request.action == 'opened'
         uses: actions/github-script@v3
         with:
           script: |
