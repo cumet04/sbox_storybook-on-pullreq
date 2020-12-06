@@ -3,14 +3,12 @@ on:
   push:
     branches: [main]
     paths:
-      - frontend/.storybook
-      - frontend/src/stories
+      - frontend
       - .github/workflows/storybook.yml
   pull_request:
     types: [opened, reopened, synchronize, closed]
     paths:
-      - frontend/.storybook
-      - frontend/src/stories
+      - frontend
       - .github/workflows/storybook.yml
 jobs:
   deploy:
