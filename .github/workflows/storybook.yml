@@ -53,6 +53,7 @@ jobs:
               body: 'storybook preview created!!\n' +
                 'https://${{ secrets.BUCKET_NAME }}.s3-ap-northeast-1.amazonaws.com/storybook/${{ github.event.pull_request.number }}/index.html'
             })
+            
   clean:
     runs-on: ubuntu-latest
     if: github.event.action == 'closed'
